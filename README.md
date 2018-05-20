@@ -38,6 +38,7 @@ https://godoc.org/github.com/mcandre/popcopy
 * [golint](https://github.com/golang/lint) (e.g. `go get github.com/golang/lint/golint`)
 * [errcheck](https://github.com/kisielk/errcheck) (e.g. `go get github.com/kisielk/errcheck`)
 * [nakedret](https://github.com/alexkohler/nakedret) (e.g. `go get github.com/alexkohler/nakedret`)
+* [karp](https://github.com/mcandre/karp) (e.g., `go get github.com/mcandre/karp/...`)
 
 # TEST REMOTELY
 
