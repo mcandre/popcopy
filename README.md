@@ -8,18 +8,18 @@ popcopy recursively copies files and folders to the desired destination path, ex
 
 ```go
 import (
-  "regexp"
-  "github.com/mcandre/popcopy"
+	"regexp"
+	"github.com/mcandre/popcopy"
 )
 
 func main() {
 	if err := popcopy.Copy(
-    "business-presentations",
-    "/media/usbstick",
-    []regexp.Regexp{regexp.MustCompile("Thumbs.db")},
-  ); err != nil {
-    panic(err)
-  }
+		"business-presentations",
+		"/media/usbstick",
+		[]regexp.Regexp{regexp.MustCompile("Thumbs.db")},
+	); err != nil {
+		panic(err)
+	}
 }
 ```
 
