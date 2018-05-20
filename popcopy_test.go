@@ -13,10 +13,13 @@ import (
 
 func TestCopy(t *testing.T) {
 	sourcePrefix := "business-presentations"
-	forecastName := "forecast.txt"
-	forecast := []byte("30% growth month over month\n")
 	junkName := "Thumbs.db"
 	junk := []byte{}
+	forecastName := "forecast.txt"
+	forecast := []byte("30% growth month over month\n")
+	imagesName := "images"
+	imageName := "space.bmp"
+	image := []byte{}
 	targetPrefix := "usbkey"
 	exclusions := []*regexp.Regexp{
 		regexp.MustCompile("Thumbs.db"),
@@ -33,13 +36,19 @@ func TestCopy(t *testing.T) {
 		t.Error(err)
 	}
 
-	sourceBasePath := filepath.Base(sourceAbsPath)
-
 	if err = ioutil.WriteFile(filepath.Join(sourceAbsPath, forecastName), forecast, 0666); err != nil {
 		t.Error(err)
 	}
 
 	if err = ioutil.WriteFile(filepath.Join(sourceAbsPath, junkName), junk, 0666); err != nil {
+		t.Error(err)
+	}
+
+	if err = os.MkdirAll(filepath.Join(sourceAbsPath, imagesName), os.ModeDir|0775); err != nil {
+		t.Error(err)
+	}
+
+	if err = ioutil.WriteFile(filepath.Join(sourceAbsPath, imagesName, imageName), image, 0666); err != nil {
 		t.Error(err)
 	}
 
@@ -60,7 +69,7 @@ func TestCopy(t *testing.T) {
 		t.Error(err)
 	}
 
-	observedForecast, err := ioutil.ReadFile(filepath.Join(targetAbsPath, sourceBasePath, forecastName))
+	observedForecast, err := ioutil.ReadFile(filepath.Join(targetAbsPath, forecastName))
 
 	if err != nil {
 		t.Error(err)
@@ -70,7 +79,17 @@ func TestCopy(t *testing.T) {
 		t.Errorf("Expected forecast %v to equal %v", observedForecast, forecast)
 	}
 
-	targetWithJunk := filepath.Join(targetAbsPath, sourceBasePath, junkName)
+	observedImage, err := ioutil.ReadFile(filepath.Join(targetAbsPath, imagesName, imageName))
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(observedImage, image) {
+		t.Errorf("Expected image %v to equal %v", observedImage, image)
+	}
+
+	targetWithJunk := filepath.Join(targetAbsPath, junkName)
 
 	if _, err := os.Stat(targetWithJunk); !os.IsNotExist(err) {
 		t.Errorf("Expected %v to not exist", targetWithJunk)

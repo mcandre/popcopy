@@ -9,10 +9,10 @@ import (
 	"regexp"
 )
 
-// Copy recursively copies the named directory or file path
-// to the target directory path,
+// copy recursively copies source files
+// to the target directory root path,
 // excluding any specified path patterns.
-func Copy(source string, target string, exclusions []*regexp.Regexp) error {
+func copy(source string, targetRoot string, exclusions []*regexp.Regexp) error {
 	sourceAbs, err := filepath.Abs(source)
 
 	if err != nil {
@@ -31,20 +31,20 @@ func Copy(source string, target string, exclusions []*regexp.Regexp) error {
 		return err
 	}
 
-	targetAbs, err := filepath.Abs(target)
+	targetRootAbs, err := filepath.Abs(targetRoot)
 
 	if err != nil {
 		return err
 	}
 
 	sourceBase := filepath.Base(source)
-	targetAbsWithSourceBase := filepath.Join(targetAbs, sourceBase)
+	targetRootAbsWithSourceBase := filepath.Join(targetRootAbs, sourceBase)
 
 	sourceMode := sourceFI.Mode()
 
 	switch {
 	case sourceMode.IsDir():
-		if err := os.MkdirAll(targetAbsWithSourceBase, os.ModeDir|0775); err != nil {
+		if err := os.MkdirAll(targetRootAbsWithSourceBase, os.ModeDir|0775); err != nil {
 			return err
 		}
 
@@ -57,7 +57,7 @@ func Copy(source string, target string, exclusions []*regexp.Regexp) error {
 		for _, childFI := range childrenFI {
 			child := childFI.Name()
 
-			if err := Copy(filepath.Join(source, child), targetAbsWithSourceBase, exclusions); err != nil {
+			if err := copy(filepath.Join(sourceAbs, child), targetRootAbsWithSourceBase, exclusions); err != nil {
 				return err
 			}
 		}
@@ -73,7 +73,7 @@ func Copy(source string, target string, exclusions []*regexp.Regexp) error {
 			return err
 		}
 
-		fOut, err := os.Create(targetAbsWithSourceBase)
+		fOut, err := os.Create(targetRootAbsWithSourceBase)
 		defer func() {
 			if err = fOut.Close(); err != nil {
 				log.Panic(err)
@@ -90,4 +90,49 @@ func Copy(source string, target string, exclusions []*regexp.Regexp) error {
 	}
 
 	return nil
+}
+
+// Copy recursively copies child file(s) of the source path
+// to the target directory root path,
+// excluding any specified path patterns.
+func Copy(source string, targetRoot string, exclusions []*regexp.Regexp) error {
+	sourceAbs, err := filepath.Abs(source)
+
+	if err != nil {
+		return err
+	}
+
+	for _, exclusion := range exclusions {
+		if exclusion.MatchString(sourceAbs) {
+			return nil
+		}
+	}
+
+	sourceFI, err := os.Stat(sourceAbs)
+
+	if err != nil {
+		return err
+	}
+
+	sourceMode := sourceFI.Mode()
+
+	switch {
+	case sourceMode.IsDir():
+		childrenFI, err := ioutil.ReadDir(sourceAbs)
+
+		if err != nil {
+			return err
+		}
+
+		for _, childFI := range childrenFI {
+			child := childFI.Name()
+			if err := copy(filepath.Join(sourceAbs, child), targetRoot, exclusions); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	default:
+		return copy(sourceAbs, targetRoot, []*regexp.Regexp{})
+	}
 }

@@ -2,7 +2,7 @@
 
 # ABOUT
 
-popcopy recursively copies files and folders to the desired destination path, excluding patterns you don't want copied.
+popcopy recursively copies child file(s) to the desired destination path, excluding patterns you don't want copied.
 
 # EXAMPLE
 
