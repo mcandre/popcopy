@@ -87,6 +87,8 @@ func copy(source string, targetRoot string, exclusions []*regexp.Regexp) error {
 		if _, err := io.Copy(fOut, fIn); err != nil {
 			return err
 		}
+
+		return os.Chmod(targetRootAbsWithSourceBase, sourceMode)
 	}
 
 	return nil
@@ -108,6 +110,16 @@ func Copy(source string, targetRoot string, exclusions []*regexp.Regexp) error {
 		}
 	}
 
+	targetRootAbs, err := filepath.Abs(targetRoot)
+
+	if err != nil {
+		return err
+	}
+
+	if err = os.MkdirAll(targetRootAbs, os.ModeDir|0775); err != nil {
+		return err
+	}
+
 	sourceFI, err := os.Stat(sourceAbs)
 
 	if err != nil {
@@ -126,13 +138,13 @@ func Copy(source string, targetRoot string, exclusions []*regexp.Regexp) error {
 
 		for _, childFI := range childrenFI {
 			child := childFI.Name()
-			if err := copy(filepath.Join(sourceAbs, child), targetRoot, exclusions); err != nil {
+			if err := copy(filepath.Join(sourceAbs, child), targetRootAbs, exclusions); err != nil {
 				return err
 			}
 		}
 
 		return nil
 	default:
-		return copy(sourceAbs, targetRoot, []*regexp.Regexp{})
+		return copy(sourceAbs, targetRootAbs, []*regexp.Regexp{})
 	}
 }
