@@ -29,7 +29,7 @@ https://godoc.org/github.com/mcandre/popcopy
 
 # BUILDTIME REQUIREMENTS
 
-* [Go](https://golang.org/) 1.9+
+* [Go](https://golang.org/) 1.11+
 
 ## Recommended
 
@@ -38,23 +38,24 @@ https://godoc.org/github.com/mcandre/popcopy
 * [golint](https://github.com/golang/lint) (e.g. `go get github.com/golang/lint/golint`)
 * [errcheck](https://github.com/kisielk/errcheck) (e.g. `go get github.com/kisielk/errcheck`)
 * [nakedret](https://github.com/alexkohler/nakedret) (e.g. `go get github.com/alexkohler/nakedret`)
+* [shadow](golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow) (e.g. `go get -u golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow`)
 * [karp](https://github.com/mcandre/karp) (e.g., `go get github.com/mcandre/karp/...`)
 
 # TEST REMOTELY
 
-```
+```console
 $ go test github.com/mcandre/popcopy/...
 ```
 
 # TEST LOCALLY
 
-```
+```console
 $ go test
 ```
 
 # COVERAGE
 
-```
+```console
 $ mage coverageHTML
 $ karp cover.html
 ```
@@ -63,6 +64,6 @@ $ karp cover.html
 
 Keep the code tidy:
 
-```
+```console
 $ mage lint
 ```
