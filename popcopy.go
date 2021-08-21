@@ -9,6 +9,9 @@ import (
 	"regexp"
 )
 
+// Version is semver.
+const Version = "0.0.1"
+
 // ImplicitExclusions configures automatic file pattern exclusions.
 var ImplicitExclusions = []*regexp.Regexp{
 	regexp.MustCompile("\\.git"),
